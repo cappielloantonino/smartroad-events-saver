@@ -1,5 +1,6 @@
 package it.almaviva.smartroadeventssaver.cassandra.entity;
 
+import it.almaviva.smartroadeventssaver.cassandra.model.CassandraDenmPK;
 import lombok.Data;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
@@ -19,7 +20,6 @@ public class CassandraDenm extends CassandraEventEntity {
 
     @Column
     private boolean certified;
-    */
 
     @PrimaryKeyColumn(ordinal = 2, type = PrimaryKeyType.CLUSTERED)
     private long detectionTimestamp;
@@ -32,4 +32,8 @@ public class CassandraDenm extends CassandraEventEntity {
 
     @Column
     private String payload;
+    */
+
+    @PrimaryKey
+    private CassandraDenmPK denmPK;
 }

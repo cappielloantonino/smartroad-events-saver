@@ -9,6 +9,7 @@ import it.almaviva.etsi.header.StationID;
 import it.almaviva.smartroadeventssaver.cassandra.entity.ActionID;
 import it.almaviva.smartroadeventssaver.cassandra.entity.CassandraDenm;
 import it.almaviva.smartroadeventssaver.cassandra.entity.CassandraEventEntity;
+import it.almaviva.smartroadeventssaver.cassandra.model.CassandraDenmPK;
 
 public class CassandraDenmFactory extends CassandraEventsFactory {
 
@@ -28,6 +29,7 @@ public class CassandraDenmFactory extends CassandraEventsFactory {
         Long priority = denm.getPriority();
         boolean certified = denm.isCertified();
 
+        /*
         CassandraDenm cassandraDenm = new CassandraDenm();
         cassandraDenm.setActionID(new ActionID(stationID.value, sequenceNumber.value));
         cassandraDenm.setDetectionTimestamp(detectionTime.value);
@@ -35,6 +37,18 @@ public class CassandraDenmFactory extends CassandraEventsFactory {
         cassandraDenm.setValidityDuration(validityDuration.value);
         cassandraDenm.setPriority(priority);
         cassandraDenm.setCertified(certified);
+        cassandraDenm.setPayload(payload);
+        */
+
+        CassandraDenm cassandraDenm = new CassandraDenm();
+        CassandraDenmPK denmPK = new CassandraDenmPK();
+        denmPK.setActionID(new ActionID(stationID.value, sequenceNumber.value));
+        denmPK.setCertified(certified);
+        denmPK.setPriority(priority);
+        denmPK.setDetectionTimestamp(detectionTime.value);
+        denmPK.setReferenceTimestamp(referenceTime.value);
+        denmPK.setValidityDuration(validityDuration.value);
+        cassandraDenm.setDenmPK(denmPK);
         cassandraDenm.setPayload(payload);
 
         return cassandraDenm;

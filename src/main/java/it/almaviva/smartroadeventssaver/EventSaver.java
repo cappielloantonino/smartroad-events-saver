@@ -11,8 +11,10 @@ import it.almaviva.smartroadeventssaver.cassandra.CassandraService;
 import it.almaviva.smartroadeventssaver.cassandra.entity.CassandraEventEntity;
 import it.almaviva.smartroadeventssaver.cassandra.entity.factory.CassandraEventsFactory;
 import it.almaviva.smartroadeventssaver.kafka.producer.KafkaProducer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class EventSaver {
@@ -28,11 +30,10 @@ public class EventSaver {
         //Denm obj = objectMapper.readValue(denmMessage, Denm.class);
         Denm obj = new Denm(new ItsPduHeader(), new DecentralizedEnvironmentalNotificationMessage());
 
-
         // scrittura cassandra su tabella denm
         CassandraEventEntity cassandraEvent = CassandraEventsFactory.getFactory(obj).createCassandraEvent(denmMessage);
         System.out.println(cassandraEvent);
-        //cassandraService.write(cassandraEvent);
+        cassandraService.write(cassandraEvent);
 
         // scrittura kafka su topic out-denm
         kafkaProducer.sendMessage(Enum.MessageType.DENM, denmMessage);

@@ -1,7 +1,8 @@
 package it.almaviva.smartroadeventssaver.cassandra;
 
+import it.almaviva.smartroadeventssaver.cassandra.entity.CassandraDenm;
 import it.almaviva.smartroadeventssaver.cassandra.entity.CassandraEventEntity;
-import it.almaviva.smartroadeventssaver.cassandra.repository.CassandraEventsRepository;
+import it.almaviva.smartroadeventssaver.cassandra.repository.CassandraDenmRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,11 +10,11 @@ import org.springframework.stereotype.Service;
 public class CassandraService {
 
     @Autowired
-    CassandraEventsRepository cassandraRepository;
+    CassandraDenmRepository cassandraDenmRepository;
 
     public boolean write(CassandraEventEntity cassandraEvent) {
         // try
-        cassandraRepository.insert(cassandraEvent);
+        cassandraDenmRepository.insert((CassandraDenm) cassandraEvent);
 
         // catch
 

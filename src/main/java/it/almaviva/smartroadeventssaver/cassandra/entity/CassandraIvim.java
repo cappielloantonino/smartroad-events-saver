@@ -1,5 +1,7 @@
 package it.almaviva.smartroadeventssaver.cassandra.entity;
 
+import it.almaviva.smartroadeventssaver.cassandra.model.CassandraDenmPK;
+import it.almaviva.smartroadeventssaver.cassandra.model.CassandraIvimPK;
 import lombok.Data;
 import org.springframework.data.cassandra.core.mapping.*;
 
@@ -18,7 +20,7 @@ public class CassandraIvim extends CassandraEventEntity {
 
     @Column
     private boolean certified;
-    */
+
 
     @Column
     private long validfrom;
@@ -28,4 +30,8 @@ public class CassandraIvim extends CassandraEventEntity {
 
     @Column
     private String payload;
+    */
+
+    @PrimaryKey
+    private CassandraIvimPK ivimPK;
 }

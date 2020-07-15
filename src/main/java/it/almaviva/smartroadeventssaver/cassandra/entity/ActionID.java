@@ -11,14 +11,11 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @UserDefinedType(value = "actionid")
-//@PrimaryKeyClass
 public class ActionID implements Serializable {
 
-    //@PrimaryKeyColumn(name = "station_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
-    @CassandraType(type = CassandraType.Name.BIGINT)
+    @CassandraType(type = CassandraType.Name.BIGINT, userTypeName = "station_id")
     private long stationID;
 
-    //@PrimaryKeyColumn(name = "sequence_number", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
-    @CassandraType(type = CassandraType.Name.BIGINT)
+    @CassandraType(type = CassandraType.Name.BIGINT, userTypeName = "sequence_number")
     private long sequenceNumber;
 }
