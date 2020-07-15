@@ -1,5 +1,6 @@
 package it.almaviva.smartroadeventssaver.kafka.producer;
 
+import it.almaviva.etsi.Enum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -10,27 +11,32 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Component
-public class MessageProducer {
+public class KafkaProducer {
 
     @Autowired
     private KafkaTemplate producer;
 
-    @Value(value = "${kafka.topic1}")
-    private String topic1name;
+    @Value(value = "${kafka.topic.out_denm}") //out_denm
+    private String topic_denm;
 
 
-    public MessageProducer() {}
+    public void sendMessage(Enum.MessageType messageType, String message) {
 
+        String topicName = null;
+        switch (messageType) {
+            case DENM: topicName = topic_denm; break;
+            case IVIM: break;
+            case CAM: break;
+            default: break;
+        }
 
-    public void sendMessage(String message) {
-
-        ListenableFuture<SendResult<String, String>> future = producer.send(topic1name, "10", message);
+        ListenableFuture<SendResult<String, String>> future = producer.send(topicName, message);
 
         future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
 
             @Override
             public void onSuccess(SendResult<String, String> result) {
-                System.out.println("PRODUCER - Sent message=[" + message + "] with offset=[" + result.getRecordMetadata()
+                System.out.println("PRODUCER - Sent on Topic [" + result.getProducerRecord().topic() + "], message=[" + message + "] with offset=[" + result.getRecordMetadata()
                         .offset() + "]");
             }
 
