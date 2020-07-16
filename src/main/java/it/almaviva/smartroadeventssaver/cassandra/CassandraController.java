@@ -1,5 +1,6 @@
 package it.almaviva.smartroadeventssaver.cassandra;
 
+import it.almaviva.smartroadeventssaver.cassandra.entity.CassandraDenm;
 import it.almaviva.smartroadeventssaver.cassandra.repository.CassandraDenmRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,11 @@ public class CassandraController {
     @GetMapping("/save")
     public Boolean save(@RequestParam String name, @RequestParam Integer age) {
         System.out.println("save");
-        //cassandraEventsRepository.insert(new TestEntity(name, age));
+
+        CassandraDenm cassandraDenm = new CassandraDenm();
+
+        cassandraDenmRepository.insert(cassandraDenm);
+
         return true;
     }
 

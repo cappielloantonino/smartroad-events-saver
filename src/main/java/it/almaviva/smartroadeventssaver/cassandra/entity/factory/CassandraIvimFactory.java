@@ -5,6 +5,7 @@ import it.almaviva.etsi.common.TimestampIts;
 import it.almaviva.etsi.header.StationID;
 import it.almaviva.etsi.ivim.Ivim;
 import it.almaviva.etsi.ivim.container.IviIdentificationNumber;
+import it.almaviva.smartroadeventssaver.cassandra.entity.ActionID;
 import it.almaviva.smartroadeventssaver.cassandra.entity.CassandraEventEntity;
 import it.almaviva.smartroadeventssaver.cassandra.entity.CassandraIvim;
 
@@ -18,14 +19,12 @@ class CassandraIvimFactory extends CassandraEventsFactory {
     }
 
     public CassandraEventEntity createCassandraEvent(String payload) {
-        /*
         Ivim ivim = (Ivim) etsi;
         StationID stationID = ivim.getHeader().getStationID();
         IviIdentificationNumber iviIdentificationNumber = ivim.getIvi().getMandatory().getIviIdentificationNumber();
-        //ActionID ??????????
         TimestampIts validFrom = ivim.getIvi().getMandatory().getValidFrom();
         TimestampIts validTo = ivim.getIvi().getMandatory().getValidTo();
-        Long priority = ivim.getPriority();
+        long priority = ivim.getPriority();
         boolean certified = ivim.isCertified();
 
         CassandraIvim cassandraIvim = new CassandraIvim();
@@ -36,7 +35,5 @@ class CassandraIvimFactory extends CassandraEventsFactory {
         cassandraIvim.setCertified(certified);
 
         return cassandraIvim;
-        */
-        return new CassandraIvim();
     }
 }

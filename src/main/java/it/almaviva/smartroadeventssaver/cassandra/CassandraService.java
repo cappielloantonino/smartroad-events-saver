@@ -14,6 +14,7 @@ public class CassandraService {
 
     public boolean write(CassandraEventEntity cassandraEvent) {
         // try
+
         cassandraDenmRepository.insert((CassandraDenm) cassandraEvent);
 
         // catch

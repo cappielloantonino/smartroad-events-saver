@@ -1,5 +1,6 @@
 package it.almaviva.smartroadeventssaver.kafka;
 
+import it.almaviva.etsi.Enum;
 import it.almaviva.smartroadeventssaver.kafka.producer.KafkaProducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,7 @@ public class KafkaController {
 
     @GetMapping("/produce")
     public Boolean produce(@RequestParam String message) {
-        //kafkaProducer.sendMessage(message);
+        kafkaProducer.sendMessage(Enum.MessageType.IVIM, message);
 
         return true;
     }

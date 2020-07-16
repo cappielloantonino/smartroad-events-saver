@@ -25,7 +25,7 @@ public class KafkaProducer {
         String topicName = null;
         switch (messageType) {
             case DENM: topicName = topic_denm; break;
-            case IVIM: break;
+            case IVIM: topicName = "in-ivim"; break; // SOLO PER TEST
             case CAM: break;
             default: break;
         }
