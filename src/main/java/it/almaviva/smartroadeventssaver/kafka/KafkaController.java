@@ -16,7 +16,7 @@ public class KafkaController {
 
     @GetMapping("/produce")
     public Boolean produce(@RequestParam String message) {
-        kafkaProducer.sendMessage(Enum.MessageType.IVIM, message);
+        kafkaProducer.sendMessage(message, Enum.MessageType.IVIM);
 
         return true;
     }

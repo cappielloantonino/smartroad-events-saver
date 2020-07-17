@@ -4,6 +4,7 @@ package it.almaviva.smartroadeventssaver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.almaviva.etsi.Enum;
+import it.almaviva.etsi.Etsi;
 import it.almaviva.etsi.common.TimestampIts;
 import it.almaviva.etsi.denm.DecentralizedEnvironmentalNotificationMessage;
 import it.almaviva.etsi.denm.Denm;
@@ -17,11 +18,13 @@ import it.almaviva.smartroadeventssaver.cassandra.entity.factory.CassandraEvents
 import it.almaviva.smartroadeventssaver.cassandra.repository.CassandraDenmRepository;
 import it.almaviva.smartroadeventssaver.cassandra.repository.CassandraIvimRepository;
 import it.almaviva.smartroadeventssaver.kafka.producer.KafkaProducer;
+import it.almaviva.smartroadeventssaver.utils.CassandraException;
+import it.almaviva.smartroadeventssaver.utils.KafkaException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
+@Slf4j
 @Service
 public class EventSaver {
 
@@ -31,49 +34,60 @@ public class EventSaver {
     @Autowired
     KafkaProducer kafkaProducer;
 
-    @Autowired
-    CassandraIvimRepository cassandraIvimRepository;
 
-    public void menageDataFromAmqp(String denmMessage) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Denm obj = objectMapper.readValue(denmMessage, Denm.class);
-        //Denm obj = new Denm(new ItsPduHeader(), new DecentralizedEnvironmentalNotificationMessage());
-        System.out.println(obj);
+    public void menageDataFromAmqp(String messageJson) {
+        try {
+            // conversione json -> obj
+            Denm messageObj = new ObjectMapper().readValue(messageJson, Denm.class);
+            log.info("menageDataFromAmqp - message Object: {}", messageObj);
+            System.out.println(messageObj);
 
-        // scrittura cassandra su tabella denm
-        CassandraEventEntity cassandraEvent = CassandraEventsFactory.getFactory(obj).createCassandraEvent(denmMessage);
-        System.out.println(cassandraEvent);
-        cassandraService.write(cassandraEvent);
+            // scrittura kafka su topic out-denm
+            log.info("menageDataFromAmqp - invio messaggio su topic Kafka");
+            kafkaProducer.sendMessage(messageJson, Enum.MessageType.DENM);
 
-        // scrittura kafka su topic out-denm
-        kafkaProducer.sendMessage(Enum.MessageType.DENM, denmMessage);
+            // scrittura cassandra su tabella denm
+            log.info("menageDataFromAmqp - scrittura su DB Cassandra", messageObj);
+            CassandraEventEntity cassandraEvent = CassandraEventsFactory.getFactory(messageObj).createCassandraEvent(messageJson);
+            System.out.println(cassandraEvent);
+            cassandraService.write(cassandraEvent);
+        }
+        catch(JsonProcessingException e) {
+            log.error("menageDataFromAmqp - ERROR: errore durante la conversione del JSON in Object, potrebbe " +
+                    "non trattarsi di un oggetto DENM valido", e);
+        }
+        catch(CassandraException e) {
+            log.error("menageDataFromAmqp - ERROR", e);
+        }
+        catch(Exception e){
+            log.error("menageDataFromAmqp - Generic Error", e);
+        }
     }
 
-    public void menageDataFromKafka(String message) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        //Denm obj = objectMapper.readValue(denmMessage, Denm.class);
-        //Denm obj = new Denm(new ItsPduHeader(), new DecentralizedEnvironmentalNotificationMessage());
+    public void menageDataFromKafka(String messageJson, Enum.MessageType messageType) {
+        try {
+            // conversione json -> obj
+            ObjectMapper objectMapper = new ObjectMapper();
+            Etsi messageObj = null;
+            switch (messageType) {
+                case DENM: messageObj = objectMapper.readValue(messageJson, Denm.class); break;
+                case IVIM: messageObj = objectMapper.readValue(messageJson, Ivim.class); break;
+                default: break;
+            }
+            log.info("menageDataFromAmqp - message Object: {}", messageObj);
 
-        // ItsPduHeader
-        ItsPduHeader itsPduHeader = new ItsPduHeader();
-        // IviStructure
-        CountryCode countryCode = new CountryCode();
-        IssuerIdentifier providerIdentifier = new IssuerIdentifier(12458);
-        Provider provider = new Provider(countryCode, providerIdentifier);
-        IviIdentificationNumber iviIdentificationNumber = new IviIdentificationNumber(3147);
-        IviStatus iviStatus = new IviStatus(5);
-        IVIManagementContainer mandatory = new IVIManagementContainer(provider, iviIdentificationNumber, iviStatus);
-        mandatory.setValidFrom(new TimestampIts(2000));
-        mandatory.setValidTo(new TimestampIts(2000));
-        IviStructure iviStructure = new IviStructure(mandatory, null);
-
-        Ivim obj = new Ivim(itsPduHeader, iviStructure);
-        obj.setMessageType(Enum.MessageType.IVIM);
-
-        // scrittura cassandra su tabella
-        CassandraEventEntity cassandraEvent = CassandraEventsFactory.getFactory(obj).createCassandraEvent(message);
-        System.out.println(cassandraEvent);
-        cassandraIvimRepository.insert((CassandraIvim) cassandraEvent);
+            // scrittura cassandra su tabella denm/ivim
+            log.info("menageDataFromAmqp - scrittura su DB Cassandra", messageObj);
+            CassandraEventEntity cassandraEvent = CassandraEventsFactory.getFactory(messageObj).createCassandraEvent(messageJson);
+            System.out.println(cassandraEvent);
+            cassandraService.write(cassandraEvent);
+        }
+        catch(JsonProcessingException e){
+            log.error("menageDataFromAmqp - ERROR: errore durante la conversione del JSON in Object, potrebbe " +
+                    "non trattarsi di un oggetto DENM valido", e);
+        }
+        catch(CassandraException e) {
+            log.error("menageDataFromAmqp - ERROR", e);
+        }
     }
-
 }
