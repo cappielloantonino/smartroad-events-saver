@@ -38,13 +38,13 @@ public class KafkaConsumer{
                             @TopicPartition(topic = "${kafka.topic.out_denm}", partitions = "0")},
             groupId = "smartroad")
     public void listen(@Payload String  message,
-                       @Header(KafkaHeaders.PARTITION_ID) int partition,
+                       /*@Header(KafkaHeaders.PART) int partition,*/
                        @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                        @Header(KafkaHeaders.GROUP_ID) String groupId,
                        @Header(KafkaHeaders.OFFSET) long offset)
     {
-        log.info("KAFKA-CONSUMER[{}] - Consume topic=[{}], partition=[{}], offset=[{}], groupId=[{}]",
-                topic, topic, partition, offset, groupId);
+        log.info("KAFKA-CONSUMER[{}] - Consume topic=[{}], offset=[{}], groupId=[{}]",
+                topic, topic, offset, groupId);
         log.info("KAFKA-CONSUMER[{}] - Message: {}", topic, message);
 
         if(topic.equalsIgnoreCase(topic_in_denm))
