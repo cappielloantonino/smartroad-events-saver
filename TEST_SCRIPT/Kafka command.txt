@@ -1,0 +1,21 @@
+
+KAFKA
+	cd kafka_location\bin\windows
+
+Start Zookeper
+	zookeeper-server-start.bat ..\..\config\zookeeper.properties
+	
+Start Kafka
+	kafka-server-start.bat ..\..\config\server.properties
+	
+Creazione topic 'test'
+	kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic test
+	
+Lista topic attivi
+	kafka-topics.bat --list --bootstrap-server localhost:9092
+	
+Start producer
+	kafka-console-producer.bat --bootstrap-server localhost:9092 --topic in-ivim
+	
+Start consumer
+	kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning

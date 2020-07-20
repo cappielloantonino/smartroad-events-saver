@@ -25,12 +25,10 @@ public class JmsConsumer {
 
             String messageStr = message.getBody(String.class);
             log.info("AMQP-CONSUMER - Message: {}", messageStr);
-            System.out.println("AMQP-CONSUMER: " + messageStr);
 
             eventSaver.menageDataFromAmqp(messageStr);
         } catch (JMSException e) {
-            log.error("AMQP-CONSUMER - ERROR: impossibile recuperare il messaggio", e);
-            e.printStackTrace();
+            log.error("AMQP-CONSUMER - ERROR: impossibile recuperare il messaggio - [{}]", e.getMessage());
         }
     }
 }

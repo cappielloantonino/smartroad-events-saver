@@ -35,7 +35,7 @@ public class KafkaConsumer{
     @KafkaListener(
             topicPartitions = {@TopicPartition(topic = "${kafka.topic.in_ivim}", partitions = "0"),
                             @TopicPartition(topic = "${kafka.topic.in_denm}", partitions = "0"),
-                            @TopicPartition(topic = "${kafka.topic.out_denm}", partitions = "0")},
+                            @TopicPartition(topic = "${kafka.topic.out_denm}", partitions = "0") /* TEST */},
             groupId = "smartroad")
     public void listen(@Payload String  message,
                        /*@Header(KafkaHeaders.PART) int partition,*/
@@ -49,7 +49,7 @@ public class KafkaConsumer{
 
         if(topic.equalsIgnoreCase(topic_in_denm))
             eventSaver.menageDataFromKafka(message, Enum.MessageType.DENM);
-        else if(topic.equalsIgnoreCase(topic_in_denm)) {
+        else if(topic.equalsIgnoreCase(topic_in_ivim)) {
             eventSaver.menageDataFromKafka(message, Enum.MessageType.IVIM);
         }
     }

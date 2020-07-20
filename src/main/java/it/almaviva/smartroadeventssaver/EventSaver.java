@@ -19,6 +19,7 @@ import it.almaviva.smartroadeventssaver.cassandra.repository.CassandraDenmReposi
 import it.almaviva.smartroadeventssaver.cassandra.repository.CassandraIvimRepository;
 import it.almaviva.smartroadeventssaver.kafka.producer.KafkaProducer;
 import it.almaviva.smartroadeventssaver.utils.CassandraException;
+import it.almaviva.smartroadeventssaver.utils.EtsiParser;
 import it.almaviva.smartroadeventssaver.utils.KafkaException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,8 @@ public class EventSaver {
     public void menageDataFromAmqp(String messageJson) {
         try {
             // conversione json -> obj
-            Denm messageObj = new ObjectMapper().readValue(messageJson, Denm.class);
-            log.info("menageDataFromAmqp - message Object: {}", messageObj);
-            System.out.println(messageObj);
+            Etsi messageObj = EtsiParser.jsonToEtsi(messageJson, Enum.MessageType.DENM);
+            log.info("menageDataFromKafka - message Object: {}", messageObj);
 
             // scrittura kafka su topic out-denm
             log.info("menageDataFromAmqp - invio messaggio su topic Kafka");
@@ -49,45 +49,43 @@ public class EventSaver {
             // scrittura cassandra su tabella denm
             log.info("menageDataFromAmqp - scrittura su DB Cassandra", messageObj);
             CassandraEventEntity cassandraEvent = CassandraEventsFactory.getFactory(messageObj).createCassandraEvent(messageJson);
-            System.out.println(cassandraEvent);
             cassandraService.write(cassandraEvent);
         }
         catch(JsonProcessingException e) {
             log.error("menageDataFromAmqp - ERROR: errore durante la conversione del JSON in Object, potrebbe " +
-                    "non trattarsi di un oggetto DENM valido", e);
+                    "non trattarsi di un oggetto DENM valido - [{}]", e.getMessage());
+            e.printStackTrace();
         }
         catch(CassandraException e) {
-            log.error("menageDataFromAmqp - ERROR", e);
+            log.error("menageDataFromAmqp - ERROR - [{}]", e.getMessage());
+            e.printStackTrace();
         }
         catch(Exception e){
-            log.error("menageDataFromAmqp - Generic Error", e);
+            log.error("menageDataFromAmqp - ERROR - [{}]", e);
+            e.printStackTrace();
         }
     }
 
     public void menageDataFromKafka(String messageJson, Enum.MessageType messageType) {
         try {
             // conversione json -> obj
-            ObjectMapper objectMapper = new ObjectMapper();
-            Etsi messageObj = null;
-            switch (messageType) {
-                case DENM: messageObj = objectMapper.readValue(messageJson, Denm.class); break;
-                case IVIM: messageObj = objectMapper.readValue(messageJson, Ivim.class); break;
-                default: break;
-            }
-            log.info("menageDataFromAmqp - message Object: {}", messageObj);
+            Etsi messageObj = EtsiParser.jsonToEtsi(messageJson, messageType);
+            log.info("menageDataFromKafka - message Object: {}", messageObj);
 
             // scrittura cassandra su tabella denm/ivim
-            log.info("menageDataFromAmqp - scrittura su DB Cassandra", messageObj);
+            log.info("menageDataFromKafka - scrittura su DB Cassandra", messageObj);
             CassandraEventEntity cassandraEvent = CassandraEventsFactory.getFactory(messageObj).createCassandraEvent(messageJson);
-            System.out.println(cassandraEvent);
             cassandraService.write(cassandraEvent);
         }
         catch(JsonProcessingException e){
-            log.error("menageDataFromAmqp - ERROR: errore durante la conversione del JSON in Object, potrebbe " +
-                    "non trattarsi di un oggetto DENM valido", e);
+            log.error("menageDataFromKafka - ERROR: errore durante la conversione del JSON in Object, potrebbe " +
+                    "non trattarsi di un oggetto DENM valido - [{}]", e.getMessage());
         }
         catch(CassandraException e) {
-            log.error("menageDataFromAmqp - ERROR", e);
+            log.error("menageDataFromKafka - ERROR - [{}]", e.getMessage());
+        }
+        catch(Exception e){
+            log.error("menageDataFromKafka - ERROR - {}", e);
         }
     }
 }

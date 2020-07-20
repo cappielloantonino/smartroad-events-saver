@@ -7,9 +7,12 @@ import it.almaviva.etsi.Etsi;
 import it.almaviva.etsi.denm.Denm;
 import it.almaviva.etsi.ivim.Ivim;
 
-public class EtsiMapper {
+import java.text.ParseException;
+import java.util.IllegalFormatException;
 
-    public static Etsi convertToEtsi(String jsonMessage, Enum.MessageType messageType) throws JsonProcessingException {
+public class EtsiParser {
+
+    public static Etsi jsonToEtsi(String jsonMessage, Enum.MessageType messageType) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         Etsi etsi = null;
 
@@ -19,10 +22,15 @@ public class EtsiMapper {
             default: break;
         }
 
+        if(etsi.getMessageType() == null) {
+            throw new Exception("EtsiParser[jsonToEtsi] - non è possibile stabilire il tipo di messaggio ricevuto, " +
+                    "potrebbe trattarsi di un oggetto vuoto - " + etsi.toString());
+        }
+
         return etsi;
     }
 
-    public static String convertToJson(Etsi etsi) throws JsonProcessingException {
+    public static String etsiToJson(Etsi etsi) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(etsi);
     }
 }

@@ -33,6 +33,7 @@ class CassandraIvimFactory extends CassandraEventsFactory {
         cassandraIvim.setValidTo(validTo.value);
         cassandraIvim.setPriority(priority);
         cassandraIvim.setCertified(certified);
+        cassandraIvim.setPayload(payload);
 
         return cassandraIvim;
     }

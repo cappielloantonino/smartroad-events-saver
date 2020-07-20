@@ -19,7 +19,7 @@ public class KafkaProducer {
     @Autowired
     private KafkaTemplate producer;
 
-    @Value(value = "${kafka.topic.out_denm}") //out_denm
+    @Value(value = "${kafka.topic.out_denm}")
     private String topic_denm;
 
 
@@ -32,8 +32,8 @@ public class KafkaProducer {
             default: break;
         }
 
-        log.info("KAFKA-PRODUCER - Topic: {}", topicName);
-        log.info("KAFKA-PRODUCER - Message: {}", messageJson);
+        log.info("KAFKA-PRODUCER[{}] - Topic: {}", topicName, topicName);
+        log.info("KAFKA-PRODUCER[{}] - Message: {}", topicName, messageJson);
         ListenableFuture<SendResult<String, String>> future = producer.send(topicName, messageJson);
 
         future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {

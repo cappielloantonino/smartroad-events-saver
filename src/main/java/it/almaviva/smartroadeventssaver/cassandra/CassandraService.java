@@ -23,6 +23,7 @@ public class CassandraService {
 
     public void write(CassandraEventEntity cassandraEvent) throws CassandraException {
         try {
+            log.info("write - CassandraEventEntity: {}", cassandraEvent);
             if (cassandraEvent instanceof CassandraDenm)
                 cassandraDenmRepository.insert((CassandraDenm) cassandraEvent);
             else if (cassandraEvent instanceof CassandraIvim)
